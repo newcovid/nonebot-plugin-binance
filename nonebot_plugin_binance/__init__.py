@@ -21,7 +21,7 @@ __plugin_meta__ = PluginMetadata(
     type="application",
     homepage="https://github.com/newcovid/nonebot-plugin-binance",  
     config=type(plugin_config),
-    supported_adapters={"onebot.v11"},
+    supported_adapters={"~onebot.v11"},
 )
 
 # 依赖注入 htmlrender 插件
