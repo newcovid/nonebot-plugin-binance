@@ -26,6 +26,10 @@ loguru = "^0.7.0"
 pydantic = "^1.10.0"
 
 
+
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.main.api"
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["nonebot_plugin_gold_price"]
