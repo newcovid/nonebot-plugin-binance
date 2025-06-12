@@ -1,21 +1,21 @@
 <div align="center">
-  <a href="https://v2.nonebot.dev/store"><img src="https://github.com/A-kirami/nonebot-plugin-template/blob/resources/nbp_logo.png" width="180" height="180" alt="NoneBotPluginLogo"></a>
+  <a href="https://v2.nonebot.dev/store"><img src="https://github.com/A-kirami/nonebot-plugin-binance/blob/resources/nbp_logo.png" width="180" height="180" alt="NoneBotPluginLogo"></a>
   <br>
-  <p><img src="https://github.com/A-kirami/nonebot-plugin-template/blob/resources/NoneBotPlugin.svg" width="240" alt="NoneBotPluginText"></p>
+  <p><img src="https://github.com/A-kirami/nonebot-plugin-binance/blob/resources/NoneBotPlugin.svg" width="240" alt="NoneBotPluginText"></p>
 </div>
 
 <div align="center">
 
-# nonebot-plugin-template
+# nonebot-plugin-binance
 
 _✨ NoneBot 插件简单描述 ✨_
 
 
 <a href="./LICENSE">
-    <img src="https://img.shields.io/github/license/owner/nonebot-plugin-template.svg" alt="license">
+    <img src="https://img.shields.io/github/license/newcovid/nonebot-plugin-binance.svg" alt="license">
 </a>
-<a href="https://pypi.python.org/pypi/nonebot-plugin-template">
-    <img src="https://img.shields.io/pypi/v/nonebot-plugin-template.svg" alt="pypi">
+<a href="https://pypi.python.org/pypi/nonebot-plugin-binance">
+    <img src="https://img.shields.io/pypi/v/nonebot-plugin-binance.svg" alt="pypi">
 </a>
 <img src="https://img.shields.io/badge/python-3.9+-blue.svg" alt="python">
 
@@ -26,9 +26,9 @@ _✨ NoneBot 插件简单描述 ✨_
 <details open>
 <summary>模板库使用方法</summary>
 
-1. 点击 [![start-course](https://user-images.githubusercontent.com/1221423/235727646-4a590299-ffe5-480d-8cd5-8194ea184546.svg)](https://github.com/new?template_owner=A-kirami&template_name=nonebot-plugin-template&owner=%40me&name=nonebot-plugin-&visibility=public) 创建仓库
+1. 点击 [![start-course](https://user-images.githubusercontent.com/1221423/235727646-4a590299-ffe5-480d-8cd5-8194ea184546.svg)](https://github.com/new?template_newcovid=A-kirami&template_name=nonebot-plugin-binance&newcovid=%40me&name=nonebot-plugin-&visibility=public) 创建仓库
 2. 在创建好的新仓库中, 在 "Add file" 菜单中选择 "Create new file", 在新文件名处输入`LICENSE`, 此时在右侧会出现一个 "Choose a license template" 按钮, 点击此按钮选择开源协议模板, 然后在最下方提交新文件到主分支
-3. 全局替换`owner`为仓库所有者ID; 全局替换`nonebot-plugin-template`为插件名; 全局替换`nonebot_plugin_template`为包名; 修改 python 徽标中的版本为你插件的运行所需版本
+3. 全局替换`newcovid`为仓库所有者ID; 全局替换`nonebot-plugin-binance`为插件名; 全局替换`nonebot_plugin_binance`为包名; 修改 python 徽标中的版本为你插件的运行所需版本
 4. 修改 README 中的插件名和插件描述, 并在下方填充相应的内容
 
 </details>
@@ -72,7 +72,7 @@ _✨ NoneBot 插件简单描述 ✨_
 <summary>使用 nb-cli 安装</summary>
 在 nonebot2 项目的根目录下打开命令行, 输入以下指令即可安装
 
-    nb plugin install nonebot-plugin-template
+    nb plugin install nonebot-plugin-binance
 
 </details>
 
@@ -83,27 +83,27 @@ _✨ NoneBot 插件简单描述 ✨_
 <details>
 <summary>pip</summary>
 
-    pip install nonebot-plugin-template
+    pip install nonebot-plugin-binance
 </details>
 <details>
 <summary>pdm</summary>
 
-    pdm add nonebot-plugin-template
+    pdm add nonebot-plugin-binance
 </details>
 <details>
 <summary>poetry</summary>
 
-    poetry add nonebot-plugin-template
+    poetry add nonebot-plugin-binance
 </details>
 <details>
 <summary>conda</summary>
 
-    conda install nonebot-plugin-template
+    conda install nonebot-plugin-binance
 </details>
 
 打开 nonebot2 项目根目录下的 `pyproject.toml` 文件, 在 `[tool.nonebot]` 部分追加写入
 
-    plugins = ["nonebot_plugin_template"]
+    plugins = ["nonebot_plugin_binance"]
 
 </details>
 
@@ -111,16 +111,16 @@ _✨ NoneBot 插件简单描述 ✨_
 
 在 nonebot2 项目的`.env`文件中添加下表中的必填配置
 
-| 配置项 | 必填 | 默认值 | 说明 |
-|:-----:|:----:|:----:|:----:|
-| 配置项1 | 是 | 无 | 配置说明 |
-| 配置项2 | 否 | 无 | 配置说明 |
+| 配置项  | 必填  | 默认值 |   说明   |
+| :-----: | :---: | :----: | :------: |
+| 配置项1 |  是   |   无   | 配置说明 |
+| 配置项2 |  否   |   无   | 配置说明 |
 
 ## 🎉 使用
 ### 指令表
-| 指令 | 权限 | 需要@ | 范围 | 说明 |
-|:-----:|:----:|:----:|:----:|:----:|
-| 指令1 | 主人 | 否 | 私聊 | 指令说明 |
-| 指令2 | 群员 | 是 | 群聊 | 指令说明 |
+| 指令  | 权限  | 需要@ | 范围  |   说明   |
+| :---: | :---: | :---: | :---: | :------: |
+| 指令1 | 主人  |  否   | 私聊  | 指令说明 |
+| 指令2 | 群员  |  是   | 群聊  | 指令说明 |
 ### 效果图
 如果有效果图的话
