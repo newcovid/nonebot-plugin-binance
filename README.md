@@ -1,7 +1,7 @@
 <div align="center">
-  <a href="https://v2.nonebot.dev/store"><img src="https://github.com/A-kirami/nonebot-plugin-binance/blob/resources/nbp_logo.png" width="180" height="180" alt="NoneBotPluginLogo"></a>
+  <a href="https://v2.nonebot.dev/store"><img src="https://github.com/A-kirami/nonebot-plugin-template/blob/resources/nbp_logo.png" width="180" height="180" alt="NoneBotPluginLogo"></a>
   <br>
-  <p><img src="https://github.com/A-kirami/nonebot-plugin-binance/blob/resources/NoneBotPlugin.svg" width="240" alt="NoneBotPluginText"></p>
+  <p><img src="https://github.com/A-kirami/nonebot-plugin-template/blob/resources/NoneBotPlugin.svg" width="240" alt="NoneBotPluginText"></p>
 </div>
 
 <div align="center">
@@ -21,50 +21,11 @@ _✨ NoneBot 插件简单描述 ✨_
 
 </div>
 
-这是一个 nonebot2 插件项目的模板库, 你可以直接使用本模板创建你的 nonebot2 插件项目的仓库
-
-<details open>
-<summary>模板库使用方法</summary>
-
-1. 点击 [![start-course](https://user-images.githubusercontent.com/1221423/235727646-4a590299-ffe5-480d-8cd5-8194ea184546.svg)](https://github.com/new?template_newcovid=A-kirami&template_name=nonebot-plugin-binance&newcovid=%40me&name=nonebot-plugin-&visibility=public) 创建仓库
-2. 在创建好的新仓库中, 在 "Add file" 菜单中选择 "Create new file", 在新文件名处输入`LICENSE`, 此时在右侧会出现一个 "Choose a license template" 按钮, 点击此按钮选择开源协议模板, 然后在最下方提交新文件到主分支
-3. 全局替换`newcovid`为仓库所有者ID; 全局替换`nonebot-plugin-binance`为插件名; 全局替换`nonebot_plugin_binance`为包名; 修改 python 徽标中的版本为你插件的运行所需版本
-4. 修改 README 中的插件名和插件描述, 并在下方填充相应的内容
-
-</details>
-
-> [!NOTE]
-> 模板库中自带了一个发布工作流, 你可以使用此工作流自动发布你的插件到 pypi
-
-<details>
-<summary>配置发布工作流</summary>
-
-1. 前往 https://pypi.org/manage/account/#api-tokens 并创建一个新的 API 令牌。创建成功后不要关闭页面，不然你将无法再次查看此令牌。
-2. 在单独的浏览器选项卡或窗口中，打开 [Actions secrets and variables](./settings/secrets/actions) 页面。你也可以在 Settings - Secrets and variables - Actions 中找到此页面。
-3. 点击 New repository secret 按钮，创建一个名为 `PYPI_API_TOKEN` 的新令牌，并从第一步复制粘贴令牌。
-
-</details>
-
-> [!IMPORTANT]
-> 这个发布工作流需要 pyproject.toml 文件, 并且只支持 [PEP 621](https://peps.python.org/pep-0621/) 标准的 pyproject.toml 文件
-
-<details>
-<summary>触发发布工作流</summary>
-从本地推送任意 tag 即可触发。
-
-创建 tag:
-
-    git tag <tag_name>
-
-推送本地所有 tag:
-
-    git push origin --tags
-
-</details>
+一个币安 NoneBot2 插件
 
 ## 📖 介绍
 
-这里是插件的详细介绍部分
+通过集成币安官方 API，为用户提供行情查询、K线图表、资产管理、实盘交易及价格监控等功能。
 
 ## 💿 安装
 
@@ -109,18 +70,37 @@ _✨ NoneBot 插件简单描述 ✨_
 
 ## ⚙️ 配置
 
+### 必填配置
 在 nonebot2 项目的`.env`文件中添加下表中的必填配置
 
-| 配置项  | 必填  | 默认值 |   说明   |
-| :-----: | :---: | :----: | :------: |
-| 配置项1 |  是   |   无   | 配置说明 |
-| 配置项2 |  否   |   无   | 配置说明 |
+|       配置项       | 必填  | 默认值 |          说明           |
+| :----------------: | :---: | :----: | :---------------------: |
+| binance_master_key |  是   |   无   | 用于加密用户API的主密钥 |
+
+### 可选配置
+在 nonebot2 项目的`.env`文件中添加下表中的可选配置
+
+|         配置项         | 必填  | 默认值 |                                       说明                                       |
+| :--------------------: | :---: | :----: | :------------------------------------------------------------------------------: |
+|   binance_api_proxy    |  否   |   无   |           币安API的代理URL，如果您的服务器无法直接访问币安，请设置此项           |
+| binance_renderer_proxy |  否   |   无   | 用于下载图片、字体等渲染资源的代理，如果服务器访问Github等网络不稳定，请设置此项 |
+|    binance_ws_proxy    |  否   |   无   |                       币安WebSocket的代理URL，如果需要的话                       |
 
 ## 🎉 使用
+### 主密钥
+可以使用以下代码生成: 
+``` python
+from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())
+```
 ### 指令表
-| 指令  | 权限  | 需要@ | 范围  |   说明   |
-| :---: | :---: | :---: | :---: | :------: |
-| 指令1 | 主人  |  否   | 私聊  | 指令说明 |
-| 指令2 | 群员  |  是   | 群聊  | 指令说明 |
+使用bn help查看帮助
 ### 效果图
-如果有效果图的话
+![](/images/help.png)
+![](/images/status.png)
+![](/images/price.png)
+![](/images/kline.png)
+![](/images/balance.png)
+![](/images/alert.png)
+![](/images/open.png)
+
+
