@@ -15,34 +15,42 @@
     {% else %}
     <div class="status-grid">
         <div class="status-item">
-            <span class="status-label">绑定状态</span>
+            <span class="status-label">API Key 绑定状态</span>
             <span class="status-value positive">✓ 已绑定</span>
         </div>
         {% if data.error %}
         <div class="status-item">
-            <span class="status-label">API 状态</span>
+            <span class="status-label">API Key 连接状态</span>
             <span class="status-value negative">✕ {{ data.error }}</span>
         </div>
         {% else %}
         <div class="status-item">
-            <span class="status-label">交易权限</span>
-            {% if data.can_trade %}
+            <span class="status-label">账户现货交易</span>
+            {% if data.permissions.spot_trade %}
             <span class="status-value positive">✓ 已开启</span>
             {% else %}
             <span class="status-value negative">✕ 未开启</span>
             {% endif %}
         </div>
         <div class="status-item">
-            <span class="status-label">提现权限</span>
-            {% if data.can_withdraw %}
+            <span class="status-label">账户杠杆交易</span>
+            {% if data.permissions.margin_trade %}
             <span class="status-value positive">✓ 已开启</span>
             {% else %}
             <span class="status-value negative">✕ 未开启</span>
             {% endif %}
         </div>
         <div class="status-item">
-            <span class="status-label">充值权限</span>
-            {% if data.can_deposit %}
+            <span class="status-label">账户合约交易</span>
+            {% if data.permissions.futures_trade %}
+            <span class="status-value positive">✓ 已开启</span>
+            {% else %}
+            <span class="status-value negative">✕ 未开启</span>
+            {% endif %}
+        </div>
+        <div class="status-item">
+            <span class="status-label">账户允许提现</span>
+            {% if data.permissions.withdraw %}
             <span class="status-value positive">✓ 已开启</span>
             {% else %}
             <span class="status-value negative">✕ 未开启</span>
@@ -50,33 +58,9 @@
         </div>
         {% endif %}
     </div>
+    <div style="font-size: 13px; color: #848e9c; text-align: center; margin-top: 24px; line-height: 1.6;">
+        上方显示的是您币安 账户本身 的权限状态，而非您绑定的 API Key 的权限。<br>
+    </div>
     {% endif %}
 </div>
-
-<style>
-    .status-grid {
-        display: grid;
-        gap: 16px;
-    }
-
-    .status-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: #2c2f33;
-        padding: 16px;
-        border-radius: 12px;
-        border: 1px solid #3a3f44;
-    }
-
-    .status-label {
-        font-size: 16px;
-        color: #d1d4dc;
-    }
-
-    .status-value {
-        font-size: 16px;
-        font-weight: 600;
-    }
-</style>
 {% endblock %}

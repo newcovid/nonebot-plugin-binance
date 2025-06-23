@@ -10,19 +10,15 @@ import jinja2
 from datetime import datetime
 from .config import binance_data_path
 
+
 # --- 自定义Jinja2过滤器 ---
 def format_timestamp(ms_timestamp: float, fmt: str = "%Y-%m-%d %H:%M:%S") -> str:
-    """
-    Jinja2过滤器，用于将币安的毫秒时间戳转换为格式化的日期时间字符串。
-    """
     if not isinstance(ms_timestamp, (int, float)):
         return ""
-    # 币安API返回的时间戳是毫秒级的
     dt_object = datetime.fromtimestamp(ms_timestamp / 1000)
     return dt_object.strftime(fmt)
 
 
-# 图像缓存类
 class ImageCache:
     def __init__(self, base_path: str, proxy: Optional[str] = None):
         self.cache_dir = Path(base_path) / "image_cache"
@@ -86,14 +82,11 @@ class Drawer:
         self.template_path = Path(__file__).parent.resolve() / "templates"
         self.proxy = config.binance_renderer_proxy
         self.image_cache = ImageCache(binance_data_path, self.proxy)
-
-        # 创建Jinja2环境
         self.jinja_env = jinja2.Environment(
             loader=jinja2.FileSystemLoader(self.template_path),
             enable_async=True,
             autoescape=True,
         )
-        # 注册自定义的过滤器
         self.jinja_env.filters["format_timestamp"] = format_timestamp
 
     async def render(self, template_name: str, data: Dict[str, Any]) -> bytes:
@@ -108,14 +101,10 @@ class Drawer:
             if self.proxy:
                 render_kwargs["proxy"] = {"server": self.proxy}
 
-            # [优化] 修改 viewport 高度，让其自适应内容，解决垂直不居中的问题
             return await html_to_pic(
                 html=html_content,
                 template_path=self.template_path.as_uri(),
-                viewport={
-                    "width": 800,
-                    "height": 10,
-                },  # 高度设为10，htmlrender会自动撑开
+                viewport={"width": 800, "height": 10},
                 **render_kwargs,
             )
         except Exception as e:
@@ -125,18 +114,23 @@ class Drawer:
     async def draw_help(self) -> bytes:
         return await self.render("help.html", {})
 
-    async def draw_ticker(self, ticker_data: Dict[str, Any]) -> bytes:
-        return await self.render("tricker.html", ticker_data)
+    async def draw_multi_market_ticker(self, data: Dict[str, Any]) -> bytes:
+        return await self.render("multi_ticker.html", data)
 
-    async def draw_kline(self, kline_data: List, symbol: str, interval: str) -> bytes:
-        data = {"klines": kline_data, "symbol": symbol, "interval": interval}
-        return await self.render("kline.html", data)
+    async def draw_multi_market_kline(self, data: Dict[str, Any]) -> bytes:
+        return await self.render("multi_kline.html", data)
 
     async def draw_balance(self, balance_data: Dict[str, Any]) -> bytes:
         return await self.render("balance.html", balance_data)
 
-    async def draw_orders(self, orders: List[Dict[str, Any]], title: str) -> bytes:
-        data = {"orders": orders, "title": title}
+    async def draw_account_snapshot(self, snapshot_data: Dict[str, Any]) -> bytes:
+        return await self.render("account_snapshot.html", snapshot_data)
+
+    async def draw_positions(self, data: Dict[str, Any]) -> bytes:
+        return await self.render("positions.html", data)
+
+    async def draw_orders(self, data: Dict[str, Any]) -> bytes:
+        """渲染挂单模板 (支持分组)"""
         return await self.render("orders.html", data)
 
     async def draw_alert_list(self, alerts: List[Dict[str, Any]]) -> bytes:

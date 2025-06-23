@@ -2,6 +2,7 @@
 # == nonebot_plugin_binance/handlers/system.py
 # == 说明：处理帮助、绑定等系统命令。
 # =================================================================
+import asyncio
 from nonebot import on_command
 from nonebot.params import CommandArg
 from nonebot.adapters.onebot.v11 import (
@@ -84,33 +85,49 @@ async def handle_unbind(event: Event):
 @status_cmd.handle()
 async def handle_status(event: Event):
     user_id = event.get_user_id()
-    status_data = {}
-    if auth_manager.get_keys(user_id):
-        await status_cmd.send("您已绑定API密钥。正在查询详细权限...")
-        account_info = await api_client.get_account_info(user_id)
-        if account_info and "error" not in account_info:
-            status_data = {
-                "bound": True,
-                "can_trade": account_info.get("canTrade", False),
-                "can_withdraw": account_info.get("canWithdraw", False),
-                "can_deposit": account_info.get("canDeposit", False),
-                "error": None,
-            }
-        else:
-            # 健壮地处理不同类型的错误信息
-            error_content = account_info.get("error", "未知错误")
-            if isinstance(error_content, dict):
-                error_msg = error_content.get("msg", str(error_content))
-            else:
-                error_msg = str(error_content)
-            status_data = {
-                "bound": True,
-                "error": f"API Key可能已失效或权限不足 ({error_msg})",
-            }
-    else:
+    if not auth_manager.get_keys(user_id):
         status_data = {"bound": False}
+        img = await drawer.draw_status(status_data)
+        if img:
+            await status_cmd.finish(MessageSegment.image(img))
+        else:
+            await status_cmd.finish("生成状态图片失败，请检查后台日志。")
+        return
 
-    # [优化] 调用drawer生成图片
+    await status_cmd.send("您已绑定API密钥。正在查询详细权限...")
+
+    # 并发查询现货和合约账户信息
+    tasks = {
+        "spot": api_client.get_account_info(user_id),
+        "futures": api_client.get_um_futures_account(user_id),
+    }
+    results = await asyncio.gather(*tasks.values(), return_exceptions=True)
+    spot_info, futures_info = results
+
+    permissions = {}
+    api_error = None
+
+    # 处理现货账户信息
+    if isinstance(spot_info, dict) and "error" not in spot_info:
+        permissions["spot_trade"] = spot_info.get("canTrade", False)
+        permissions["margin_trade"] = spot_info.get("isMarginTradingAllowed", False)
+        permissions["withdraw"] = spot_info.get("canWithdraw", False)
+    elif isinstance(spot_info, dict):
+        api_error = spot_info.get("error", {}).get("msg", "未知API错误")
+    else:
+        api_error = "获取现货账户信息失败"
+
+    # 处理U本位合约账户信息
+    if isinstance(futures_info, dict) and "error" not in futures_info:
+        permissions["futures_trade"] = futures_info.get("canTrade", False)
+    # 如果现货API已报错，则不再覆盖错误信息
+    elif isinstance(futures_info, dict) and not api_error:
+        api_error = futures_info.get("error", {}).get("msg", "未知API错误")
+    elif not api_error:
+        api_error = "获取合约账户信息失败"
+
+    status_data = {"bound": True, "permissions": permissions, "error": api_error}
+
     img = await drawer.draw_status(status_data)
     if img:
         await status_cmd.finish(MessageSegment.image(img))

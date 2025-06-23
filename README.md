@@ -97,9 +97,10 @@ from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())
 ### 效果图
 ![](/images/help.png)
 ![](/images/status.png)
-![](/images/price.png)
+![](/images/ticker.png)
 ![](/images/kline.png)
 ![](/images/balance.png)
+![](/images/pos.png)
 ![](/images/alert.png)
 ![](/images/open.png)
 

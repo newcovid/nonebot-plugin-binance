@@ -6,9 +6,7 @@
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     background-color: #1a1b1e;
-    /* 深色背景 */
     color: #d1d4dc;
-    /* 默认文字颜色 */
     padding: 24px;
     margin: 0;
     -webkit-font-smoothing: antialiased;
@@ -51,7 +49,6 @@ body {
     color: #ea3943;
 }
 
-/* 涨跌背景 */
 .positive-bg {
     background-color: rgba(22, 199, 132, 0.15);
 }
@@ -60,11 +57,11 @@ body {
     background-color: rgba(234, 57, 67, 0.15);
 }
 
-
-/* --- 数据表格样式 (用于挂单、预警列表) --- */
+/* --- 数据表格样式 --- */
 .data-table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
 }
 
 .data-table th,
@@ -74,6 +71,8 @@ body {
     border-bottom: 1px solid #2a2c30;
     font-size: 15px;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .data-table th {
@@ -89,7 +88,7 @@ body {
     border-bottom: none;
 }
 
-/* --- 信息卡片/网格样式 (用于帮助、行情) --- */
+/* --- 信息卡片/网格样式 --- */
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -141,4 +140,199 @@ body {
     padding: 50px 20px;
     font-size: 16px;
     color: #848e9c;
+}
+
+/* --- 账户通用样式 --- */
+.snapshot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.account-section {
+    margin-bottom: 25px;
+}
+
+.account-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #e0e0e0;
+    margin: 0 0 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #3a3f44;
+}
+
+.total-asset-label {
+    font-size: 14px;
+    color: #848e9c;
+}
+
+.total-asset-value {
+    font-size: 24px;
+    font-weight: 600;
+    color: #f0b90b;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.asset-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: #363940;
+}
+
+.asset-name {
+    font-weight: 600;
+    font-size: 16px;
+    color: #fff;
+}
+
+.asset-cell {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.right-align {
+    text-align: right;
+}
+
+.total-value {
+    font-weight: 600;
+    color: #fff;
+}
+
+.col-asset {
+    width: 34%;
+}
+
+.col-balance {
+    width: 22%;
+}
+
+.col-profit {
+    width: 22%;
+}
+
+/* --- 账户状态 (status.html) 特定样式 --- */
+.status-grid {
+    display: grid;
+    gap: 16px;
+}
+
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #2c2f33;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid #3a3f44;
+}
+
+.status-label {
+    font-size: 16px;
+    color: #d1d4dc;
+}
+
+.status-value {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* --- 挂单表格 (orders.html) 列宽优化 --- */
+.data-table.orders-table td {
+    font-size: 14px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+}
+
+.orders-table .col-symbol {
+    width: 20%;
+}
+
+.orders-table .col-side {
+    width: 12%;
+}
+
+.orders-table .col-type {
+    width: 15%;
+}
+
+.orders-table .col-price {
+    width: 18%;
+}
+
+.orders-table .col-amount {
+    width: 15%;
+}
+
+.orders-table .col-id {
+    width: 20%;
+}
+
+/* --- 多市场行情 (multi_ticker.html) 样式 --- */
+.market-section {
+    margin-bottom: 25px;
+    background-color: #2c2f33;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #3a3f44;
+}
+
+.market-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.market-name {
+    font-size: 22px;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+}
+
+.price {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.change {
+    font-size: 18px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 8px;
+    margin-left: 12px;
+    display: inline-block;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.stats-item {
+    padding: 12px;
+    background-color: #1a1b1e;
+    /* 恢复背景色 */
+    border: 1px solid #3a3f44;
+    /* 恢复边框 */
+    border-radius: 8px;
+    /* 添加圆角 */
+}
+
+.stats-item .desc {
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.stats-item .value {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 16px;
+    font-weight: 500;
+    color: #fff;
 }

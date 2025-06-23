@@ -1,6 +1,6 @@
 # =================================================================
 # == nonebot_plugin_binance/api.py
-# == 说明：封装所有对Binance API的请求。
+# == 说明：封装所有对Binance API的请求。(重构版)
 # =================================================================
 import hmac
 import hashlib
@@ -14,7 +14,16 @@ from .auth import AuthManager
 
 
 class ApiClient:
-    BASE_URL = "https://api.binance.com"
+    """
+    一个经过重构的币安API客户端，支持现货、U本位合约、币本位合约及账户API。
+    """
+
+    # 不同API的根URL
+    SPOT_API_URL = "https://api.binance.com"
+    UM_FUTURES_API_URL = "https://fapi.binance.com"
+    CM_FUTURES_API_URL = "https://dapi.binance.com"
+    # SAPI (Sub-Account/System/etc.) 和现货使用相同的基础URL
+    SAPI_URL = "https://api.binance.com"
 
     def __init__(self, auth_manager: AuthManager, config):
         self._auth_manager = auth_manager
@@ -41,32 +50,38 @@ class ApiClient:
         ).hexdigest()
 
     async def _request(
-        self, method: str, path: str, user_id: Optional[str] = None, **kwargs
+        self,
+        method: str,
+        base_url: str,
+        path: str,
+        user_id: Optional[str] = None,
+        signed: bool = False,
+        **kwargs,
     ):
-        """通用请求函数"""
-        url = f"{self.BASE_URL}{path}"
+        """
+        通用请求函数。
+        """
+        url = f"{base_url}{path}"
         params = kwargs.get("params", {})
         data = kwargs.get("data", {})
         headers = kwargs.get("headers", {})
 
-        if user_id:
+        if signed:
+            if not user_id:
+                return {"error": "需要签名的请求必须提供 user_id。"}
+
             keys = self._auth_manager.get_keys(user_id)
             if not keys:
                 return {"error": "用户未绑定或未找到API密钥。"}
             api_key, secret_key = keys
             headers["X-MBX-APIKEY"] = api_key
 
-            # 为需要签名的负载选择 params 或 data
             payload_to_sign = params if method in ["GET", "DELETE"] else data
-
             payload_to_sign["timestamp"] = int(time.time() * 1000)
             payload_to_sign["signature"] = self._sign(payload_to_sign, secret_key)
 
-            # 因为params和data是可变对象，签名信息已直接添加到其中，无需重新赋值
-
         session = await self.get_session()
         try:
-            # 明确地将处理后的 params, data, 和 headers 传递给请求
             async with session.request(
                 method,
                 url,
@@ -76,9 +91,7 @@ class ApiClient:
                 headers=headers,
             ) as response:
                 logger.debug(f"请求: {method} {response.url} | 状态: {response.status}")
-
                 raw_text = await response.text()
-                logger.debug(f"API 原始响应文本: '{raw_text}'")
 
                 if not raw_text:
                     logger.warning("API 响应体为空。")
@@ -87,7 +100,6 @@ class ApiClient:
                         if response.status == 200
                         else {"error": "Empty response body"}
                     )
-
                 try:
                     response_data = json.loads(raw_text)
                 except json.JSONDecodeError:
@@ -103,51 +115,261 @@ class ApiClient:
             logger.error(f"HTTP 请求失败: {e}")
             return {"error": f"请求失败: {e}"}
 
-    # --- 公共端点 ---
+    # ===============================================================
+    # == 公共 & 市场数据 (Public & Market Data)
+    # ===============================================================
     async def get_ping(self):
-        return await self._request("GET", "/api/v3/ping")
+        return await self._request("GET", self.SPOT_API_URL, "/api/v3/ping")
 
     async def get_ticker_24hr(self, symbol: str):
-        # 此处调用现在可以正确地将 symbol 参数传递给API
         return await self._request(
-            "GET", "/api/v3/ticker/24hr", params={"symbol": symbol.upper()}
+            "GET",
+            self.SPOT_API_URL,
+            "/api/v3/ticker/24hr",
+            params={"symbol": symbol.upper()},
         )
 
     async def get_klines(self, symbol: str, interval: str, limit: int = 100):
-        params = {"symbol": symbol.upper(), "interval": interval, "limit": limit}
-        return await self._request("GET", "/api/v3/klines", params=params)
-
-    # --- 认证端点 ---
-    async def get_account_info(self, user_id: str):
-        """获取现货账户信息"""
-        params = {"omitZeroBalances": "true"}
         return await self._request(
-            "GET", "/api/v3/account", user_id=user_id, params=params
+            "GET",
+            self.SPOT_API_URL,
+            "/api/v3/klines",
+            params={"symbol": symbol.upper(), "interval": interval, "limit": limit},
+        )
+
+    async def get_um_futures_ping(self):
+        return await self._request("GET", self.UM_FUTURES_API_URL, "/fapi/v1/ping")
+
+    async def get_um_futures_ticker_24hr(self, symbol: str):
+        return await self._request(
+            "GET",
+            self.UM_FUTURES_API_URL,
+            "/fapi/v1/ticker/24hr",
+            params={"symbol": symbol.upper()},
+        )
+
+    async def get_um_futures_klines(self, symbol: str, interval: str, limit: int = 100):
+        return await self._request(
+            "GET",
+            self.UM_FUTURES_API_URL,
+            "/fapi/v1/klines",
+            params={"symbol": symbol.upper(), "interval": interval, "limit": limit},
+        )
+
+    async def get_cm_futures_ping(self):
+        return await self._request("GET", self.CM_FUTURES_API_URL, "/dapi/v1/ping")
+
+    async def get_cm_futures_ticker_24hr(self, symbol: str):
+        return await self._request(
+            "GET",
+            self.CM_FUTURES_API_URL,
+            "/dapi/v1/ticker/24hr",
+            params={"symbol": symbol.upper()},
+        )
+
+    async def get_cm_futures_klines(self, symbol: str, interval: str, limit: int = 100):
+        return await self._request(
+            "GET",
+            self.CM_FUTURES_API_URL,
+            "/dapi/v1/klines",
+            params={"symbol": symbol.upper(), "interval": interval, "limit": limit},
+        )
+
+    # ===============================================================
+    # == 账户 & SAPI (Account & SAPI)
+    # ===============================================================
+    async def get_account_info(self, user_id: str):
+        return await self._request(
+            "GET",
+            self.SPOT_API_URL,
+            "/api/v3/account",
+            user_id=user_id,
+            signed=True,
+            params={"omitZeroBalances": "true"},
         )
 
     async def post_order(
         self, user_id: str, symbol: str, side: str, order_type: str, **kwargs
     ):
-        payload = {
+        data = {
             "symbol": symbol.upper(),
             "side": side.upper(),
             "type": order_type.upper(),
         }
-        payload.update(kwargs)
+        data.update(kwargs)
         return await self._request(
-            "POST", "/api/v3/order", user_id=user_id, data=payload
+            "POST",
+            self.SPOT_API_URL,
+            "/api/v3/order",
+            user_id=user_id,
+            signed=True,
+            data=data,
         )
 
     async def get_open_orders(self, user_id: str, symbol: Optional[str] = None):
         params = {}
-        if symbol:
-            params["symbol"] = symbol.upper()
+        (params.update({"symbol": symbol.upper()}) if symbol else None)
         return await self._request(
-            "GET", "/api/v3/openOrders", user_id=user_id, params=params
+            "GET",
+            self.SPOT_API_URL,
+            "/api/v3/openOrders",
+            user_id=user_id,
+            signed=True,
+            params=params,
         )
 
     async def cancel_order(self, user_id: str, symbol: str, order_id: int):
-        payload = {"symbol": symbol.upper(), "orderId": order_id}
         return await self._request(
-            "DELETE", "/api/v3/order", user_id=user_id, data=payload
+            "DELETE",
+            self.SPOT_API_URL,
+            "/api/v3/order",
+            user_id=user_id,
+            signed=True,
+            data={"symbol": symbol.upper(), "orderId": order_id},
+        )
+
+    async def get_system_status(self):
+        return await self._request("GET", self.SAPI_URL, "/sapi/v1/system/status")
+
+    async def get_account_snapshot(self, user_id: str, account_type: str = "SPOT"):
+        return await self._request(
+            "GET",
+            self.SAPI_URL,
+            "/sapi/v1/accountSnapshot",
+            user_id=user_id,
+            signed=True,
+            params={"type": account_type.upper()},
+        )
+
+    async def get_margin_account(self, user_id: str):
+        return await self._request(
+            "GET",
+            self.SAPI_URL,
+            "/sapi/v1/margin/account",
+            user_id=user_id,
+            signed=True,
+        )
+
+    async def get_margin_open_orders(self, user_id: str, symbol: Optional[str] = None):
+        params = {}
+        (params.update({"symbol": symbol.upper()}) if symbol else None)
+        return await self._request(
+            "GET",
+            self.SAPI_URL,
+            "/sapi/v1/margin/openOrders",
+            user_id=user_id,
+            signed=True,
+            params=params,
+        )
+
+    async def get_funding_wallet(self, user_id: str):
+        """获取资金账户余额"""
+        return await self._request(
+            "POST",
+            self.SAPI_URL,
+            "/sapi/v1/asset/get-funding-asset",
+            user_id=user_id,
+            signed=True,
+        )
+
+    # ===============================================================
+    # == U本位合约 (USD-S Futures)
+    # ===============================================================
+    async def get_um_futures_account(self, user_id: str):
+        return await self._request(
+            "GET",
+            self.UM_FUTURES_API_URL,
+            "/fapi/v2/account",
+            user_id=user_id,
+            signed=True,
+        )
+
+    async def get_um_futures_balance(self, user_id: str):
+        return await self._request(
+            "GET",
+            self.UM_FUTURES_API_URL,
+            "/fapi/v2/balance",
+            user_id=user_id,
+            signed=True,
+        )
+
+    async def get_um_futures_position_risk(
+        self, user_id: str, symbol: Optional[str] = None
+    ):
+        params = {}
+        (params.update({"symbol": symbol.upper()}) if symbol else None)
+        return await self._request(
+            "GET",
+            self.UM_FUTURES_API_URL,
+            "/fapi/v2/positionRisk",
+            user_id=user_id,
+            signed=True,
+            params=params,
+        )
+
+    async def get_um_futures_open_orders(
+        self, user_id: str, symbol: Optional[str] = None
+    ):
+        params = {}
+        (params.update({"symbol": symbol.upper()}) if symbol else None)
+        return await self._request(
+            "GET",
+            self.UM_FUTURES_API_URL,
+            "/fapi/v1/openOrders",
+            user_id=user_id,
+            signed=True,
+            params=params,
+        )
+
+    # ===============================================================
+    # == 币本位合约 (COIN-M Futures)
+    # ===============================================================
+    async def get_cm_futures_account(self, user_id: str):
+        return await self._request(
+            "GET",
+            self.CM_FUTURES_API_URL,
+            "/dapi/v1/account",
+            user_id=user_id,
+            signed=True,
+        )
+
+    async def get_cm_futures_balance(self, user_id: str):
+        return await self._request(
+            "GET",
+            self.CM_FUTURES_API_URL,
+            "/dapi/v1/balance",
+            user_id=user_id,
+            signed=True,
+        )
+
+    async def get_cm_futures_position_risk(
+        self,
+        user_id: str,
+        pair: Optional[str] = None,
+        marginAsset: Optional[str] = None,
+    ):
+        params = {}
+        (params.update({"pair": pair.upper()}) if pair else None)
+        (params.update({"marginAsset": marginAsset.upper()}) if marginAsset else None)
+        return await self._request(
+            "GET",
+            self.CM_FUTURES_API_URL,
+            "/dapi/v1/positionRisk",
+            user_id=user_id,
+            signed=True,
+            params=params,
+        )
+
+    async def get_cm_futures_open_orders(
+        self, user_id: str, pair: Optional[str] = None
+    ):
+        params = {}
+        (params.update({"pair": pair.upper()}) if pair else None)
+        return await self._request(
+            "GET",
+            self.CM_FUTURES_API_URL,
+            "/dapi/v1/openOrders",
+            user_id=user_id,
+            signed=True,
+            params=params,
         )

@@ -19,7 +19,7 @@ __plugin_meta__ = PluginMetadata(
         首次使用请私聊机器人 'bn bind [API Key] [Secret Key]' 绑定账户。
     """,
     type="application",
-    homepage="https://github.com/newcovid/nonebot-plugin-binance",  
+    homepage="https://github.com/newcovid/nonebot-plugin-binance",
     config=type(plugin_config),
     supported_adapters={"~onebot.v11"},
 )
