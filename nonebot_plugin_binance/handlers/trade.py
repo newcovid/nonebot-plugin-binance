@@ -7,7 +7,7 @@ from typing import Any
 from nonebot import on_command
 from nonebot.params import CommandArg
 from nonebot.adapters.onebot.v11 import Event, Message, MessageSegment
-from loguru import logger
+from nonebot import logger
 from .. import drawer, api_client, auth_manager
 from .market import format_symbol
 

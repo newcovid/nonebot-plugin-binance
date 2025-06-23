@@ -8,12 +8,12 @@ import websockets
 import uuid
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List, DefaultDict, Optional
-from loguru import logger
+from typing import Dict, List, DefaultDict
+from nonebot import logger
 from nonebot import get_bot
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
 
-from .config import plugin_config
+from .config import binance_data_path
 
 
 class WebsocketManager:
@@ -23,7 +23,7 @@ class WebsocketManager:
         self._proxy = config.binance_ws_proxy if config.binance_ws_proxy else None
         self._alerts: DefaultDict[str, List[Dict]] = defaultdict(list)
         self._tasks: Dict[str, asyncio.Task] = {}
-        self.data_dir = Path(plugin_config.binance_data_path)
+        self.data_dir = Path(binance_data_path)
         self.alerts_file = self.data_dir / "alerts.json"
         self.data_dir.mkdir(parents=True, exist_ok=True)
 

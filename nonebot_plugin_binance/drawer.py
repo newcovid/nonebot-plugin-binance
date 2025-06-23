@@ -3,13 +3,12 @@
 # == 说明：使用htmlrender生成所有图片，并包含图片缓存逻辑。
 # =================================================================
 import aiohttp
-import hashlib
 from pathlib import Path
 from typing import Dict, Any, List, Optional
-from loguru import logger
+from nonebot import logger
 import jinja2
-from datetime import datetime  # <-- 引入datetime模块
-
+from datetime import datetime
+from .config import binance_data_path
 
 # --- 自定义Jinja2过滤器 ---
 def format_timestamp(ms_timestamp: float, fmt: str = "%Y-%m-%d %H:%M:%S") -> str:
@@ -86,7 +85,7 @@ class Drawer:
     def __init__(self, config):
         self.template_path = Path(__file__).parent.resolve() / "templates"
         self.proxy = config.binance_renderer_proxy
-        self.image_cache = ImageCache(config.binance_data_path, self.proxy)
+        self.image_cache = ImageCache(binance_data_path, self.proxy)
 
         # 创建Jinja2环境
         self.jinja_env = jinja2.Environment(

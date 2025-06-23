@@ -6,15 +6,15 @@ import json
 from pathlib import Path
 from cryptography.fernet import Fernet, InvalidToken
 from typing import Optional, Tuple, Dict
-from loguru import logger
+from nonebot import logger
 
-from .config import plugin_config
+from .config import binance_data_path
 
 
 class AuthManager:
     def __init__(self, master_key: str):
         self._keys: Dict[str, Dict[str, str]] = {}
-        self.data_dir = Path(plugin_config.binance_data_path)
+        self.data_dir = Path(binance_data_path)
         self.keys_file = self.data_dir / "user_keys.json"
         self.data_dir.mkdir(parents=True, exist_ok=True)
 

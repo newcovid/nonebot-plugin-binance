@@ -4,7 +4,7 @@
 # =================================================================
 [project]
 name = "nonebot-plugin-binance"
-version = "0.0.7"
+version = "0.0.8"
 description = "一个币安(Binance)插件，提供行情、交易、资产查询和实时价格预警功能。"
 authors = [
     { name = "newcovid", email = "280310454@qq.com" },
@@ -20,7 +20,6 @@ dependencies = [
     "aiohttp>=3.8.0",
     "cryptography>=41.0.0",
     "websockets>=11.0.0",
-    "loguru>=0.7.0",
     "pydantic>=1.10.0"
 ]
 

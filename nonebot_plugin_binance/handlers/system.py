@@ -12,7 +12,7 @@ from nonebot.adapters.onebot.v11 import (
     PrivateMessageEvent,
 )
 from .. import drawer, auth_manager, api_client
-from loguru import logger
+from nonebot import logger
 
 help_cmd = on_command("bn help", aliases={"币安帮助"}, priority=5, block=True)
 bind_cmd = on_command("bn bind", aliases={"币安绑定"}, priority=5, block=True)

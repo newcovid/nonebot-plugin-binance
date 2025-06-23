@@ -22,8 +22,6 @@ class Config(BaseModel):
     # 【WS代理】币安WebSocket的代理URL，如果需要的话
     binance_ws_proxy: str = ""
     
-    # 数据存储路径
-    binance_data_path: str = "data/binance"
 
 
 plugin_config = get_plugin_config(Config)
@@ -37,4 +35,3 @@ import nonebot_plugin_localstore as store
 
 # 数据存储路径
 binance_data_path: Path = store.get_plugin_data_dir()
-plugin_config.binance_data_path = str(binance_data_path)

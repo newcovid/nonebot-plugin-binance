@@ -9,7 +9,7 @@ import json
 from typing import Dict, Any, Optional
 from urllib.parse import urlencode
 import aiohttp
-from loguru import logger
+from nonebot import logger
 from .auth import AuthManager
 
 
